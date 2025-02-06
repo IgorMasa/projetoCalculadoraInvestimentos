@@ -16,30 +16,34 @@ const columnsArray = [
     {
         columnLabel: 'Total investido',
         accessor: 'investedAmount',
-        format: (numberInfo) => formatCurrency(numberInfo),
+        format: (numberInfo) => formatCurrencyToTable(numberInfo),
     },
     {
         columnLabel: 'Rendimento mensal',
         accessor: 'interestReturns',
-        format: (numberInfo) => formatCurrency(numberInfo),
+        format: (numberInfo) => formatCurrencyToTable(numberInfo),
     },
     {
         columnLabel: 'Rendimento total',
         accessor: 'totalInterestReturns',
-        format: (numberInfo) => formatCurrency(numberInfo),
+        format: (numberInfo) => formatCurrencyToTable(numberInfo),
     },
     {
         columnLabel: 'Quantia total',
         accessor: 'totalAmount',
-        format: (numberInfo) => formatCurrency(numberInfo),
+        format: (numberInfo) => formatCurrencyToTable(numberInfo),
     },
 ];
 
-function formatCurrency(value) {
+function formatCurrencyToTable(value) {
     return value.toLocaleString('pt-BR', {
         style: 'currency',
         currency: 'BRL',
     });
+}
+
+function formatCurrencyToGraph(value) {
+    return value.toFixed(2);
 }
 
 function renderProgression(evt) {
@@ -80,68 +84,70 @@ function renderProgression(evt) {
 
     const finalInvestmentObject = returnsArray[returnsArray.length - 1];
 
-    // doughnutChartReference = new Chart(finalMoneyChart, {
-    //     type: 'doughnut',
-    //     data: {
-    //         labels: ['Total investido', 'Rendimento', 'Imposto'],
-    //         datasets: [
-    //             {
-    //                 data: [
-    //                     formatCurrency(finalInvestmentObject.investedAmount),
-    //                     formatCurrency(
-    //                         finalInvestmentObject.totalInterestReturns *
-    //                             (1 - taxRate / 100)
-    //                     ),
-    //                     formatCurrency(
-    //                         finalInvestmentObject.totalInterestReturns *
-    //                             (taxRate / 100)
-    //                     ),
-    //                 ],
-    //                 backgroundColor: [
-    //                     'rgb(255, 99, 132)',
-    //                     'rgb(54, 162, 235)',
-    //                     'rgb(255, 205, 86)',
-    //                 ],
-    //                 hoverOffset: 4,
-    //             },
-    //         ],
-    //     },
-    // });
+    doughnutChartReference = new Chart(finalMoneyChart, {
+        type: 'doughnut',
+        data: {
+            labels: ['Total investido', 'Rendimento', 'Imposto'],
+            datasets: [
+                {
+                    data: [
+                        formatCurrencyToGraph(
+                            finalInvestmentObject.investedAmount
+                        ),
+                        formatCurrencyToGraph(
+                            finalInvestmentObject.totalInterestReturns *
+                                (1 - taxRate / 100)
+                        ),
+                        formatCurrencyToGraph(
+                            finalInvestmentObject.totalInterestReturns *
+                                (taxRate / 100)
+                        ),
+                    ],
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 205, 86)',
+                    ],
+                    hoverOffset: 4,
+                },
+            ],
+        },
+    });
 
-    // progressionChartReference = new Chart(progressionChart, {
-    //     type: 'bar',
-    //     data: {
-    //         labels: returnsArray.map(
-    //             (investmentObject) => investmentObject.month
-    //         ),
-    //         datasets: [
-    //             {
-    //                 label: 'Total Investido',
-    //                 backgroundColor: 'rgb(255,99,132)',
-    //                 data: returnsArray.map((investmentObject) =>
-    //                     formatCurrency(investmentObject.investedAmount)
-    //                 ),
-    //             },
-    //             {
-    //                 label: 'Retorno do Investimento',
-    //                 backgroundColor: 'rgb(54,162,235)',
-    //                 data: returnsArray.map((investmentObject) =>
-    //                     formatCurrency(investmentObject.interestReturns)
-    //                 ),
-    //             },
-    //         ],
-    //     },
-    //     options: {
-    //         scales: {
-    //             x: {
-    //                 stacked: true,
-    //             },
-    //             y: {
-    //                 stacked: true,
-    //             },
-    //         },
-    //     },
-    // });
+    progressionChartReference = new Chart(progressionChart, {
+        type: 'bar',
+        data: {
+            labels: returnsArray.map(
+                (investmentObject) => investmentObject.month
+            ),
+            datasets: [
+                {
+                    label: 'Total Investido',
+                    backgroundColor: 'rgb(255,99,132)',
+                    data: returnsArray.map((investmentObject) =>
+                        formatCurrencyToGraph(investmentObject.investedAmount)
+                    ),
+                },
+                {
+                    label: 'Retorno do Investimento',
+                    backgroundColor: 'rgb(54,162,235)',
+                    data: returnsArray.map((investmentObject) =>
+                        formatCurrencyToGraph(investmentObject.interestReturns)
+                    ),
+                },
+            ],
+        },
+        options: {
+            scales: {
+                x: {
+                    stacked: true,
+                },
+                y: {
+                    stacked: true,
+                },
+            },
+        },
+    });
     createTable(columnsArray, returnsArray, 'results-table');
 }
 
@@ -173,6 +179,15 @@ function clearForm() {
     for (const errorInputContainer of errorInputContainers) {
         errorInputContainer.classList.remove('error');
         errorInputContainer.parentElement.querySelector('p').remove();
+    }
+}
+
+function clearTable() {
+    if (document.querySelector('tbody') || document.querySelector('thead')) {
+        const tbody = document.querySelectorAll('tbody');
+        tbody.forEach((tag) => tag.remove());
+        const thead = document.querySelectorAll('thead');
+        thead.forEach((tag) => tag.remove());
     }
 }
 
@@ -213,5 +228,19 @@ function validateInput(evt) {
     }
 }
 
+const mainEl = document.querySelector('main');
+const carouselEl = document.getElementById('carousel');
+const nextBtn = document.getElementById('slide-arrow-next');
+const previousBtn = document.getElementById('slide-arrow-previous');
+
+nextBtn.addEventListener('click', () => {
+    carouselEl.scrollLeft += mainEl.clientWidth;
+});
+
+previousBtn.addEventListener('click', () => {
+    carouselEl.scrollLeft -= mainEl.clientWidth;
+});
+
 form.addEventListener('submit', renderProgression);
 clearFormBtn.addEventListener('click', clearForm);
+clearFormBtn.addEventListener('click', clearTable);
