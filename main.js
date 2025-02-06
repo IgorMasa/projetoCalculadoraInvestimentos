@@ -184,5 +184,5 @@ function validateInput(evt) {
     }
 }
 
-form.addEventListener('submit', renderProgression);
+// form.addEventListener('submit', renderProgression);
 clearFormBtn.addEventListener('click', clearForm);
