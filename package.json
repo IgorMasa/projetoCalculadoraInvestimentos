@@ -12,9 +12,10 @@
     "vite": "^6.0.5"
   },
   "dependencies": {
+    "@tailwindcss/cli": "^4.0.4",
     "@tailwindcss/postcss": "^4.0.3",
     "chart.js": "^4.4.7",
     "postcss": "^8.5.1",
-    "tailwindcss": "^4.0.3"
+    "tailwindcss": "^4.0.4"
   }
 }
